@@ -1,6 +1,6 @@
-import { Deal, DealStage, EscrowStatus, DealDocument, DealChecklistItem, ChecklistItemAssignee } from "@prisma/client";
+import { Deal, DealStage, EscrowStatus, DealDocument, DealChecklistItem, DealDocumentType, Visibility } from "@prisma/client";
 import { BaseRepository } from "./base/base.repository";
-import { CreateDealDTO, UpdateDealStageDTO, UpdateChecklistItemDTO, CreateChecklistItemDTO } from "@/lib/dto/deal.dto";
+import { CreateDealDTO, UpdateChecklistItemDTO, CreateChecklistItemDTO } from "@/lib/dto/deal.dto";
 import { prisma, PrismaTx } from "@/lib/db/prisma";
 
 export class DealRepository extends BaseRepository<
@@ -59,15 +59,9 @@ export class DealRepository extends BaseRepository<
   /**
    * Retrieves a deal with all its relational details (checklist, documents, messages, offer)
    */
-  async findWithDetails(id: string, tx?: PrismaTx): Promise<(Deal & {
-    listing: any;
-    offer: any;
-    buyer: any;
-    seller: any;
-    documents: DealDocument[];
-    checklistItems: DealChecklistItem[];
-  }) | null> {
-    return this.getModel(tx).findFirst({
+  async findWithDetails(id: string, tx?: PrismaTx) {
+    const client = tx || this.prisma;
+    return client.deal.findFirst({
       where: { id, deletedAt: null },
       include: {
         listing: true,
@@ -97,7 +91,8 @@ export class DealRepository extends BaseRepository<
     data: CreateChecklistItemDTO,
     tx?: PrismaTx
   ): Promise<DealChecklistItem> {
-    return this.prisma.dealChecklistItem.create({
+    const client = tx || this.prisma;
+    return client.dealChecklistItem.create({
       data: {
         dealId,
         ...data,
@@ -110,7 +105,8 @@ export class DealRepository extends BaseRepository<
     data: UpdateChecklistItemDTO & { completedBy?: string | null; completedAt?: Date | null },
     tx?: PrismaTx
   ): Promise<DealChecklistItem> {
-    return this.prisma.dealChecklistItem.update({
+    const client = tx || this.prisma;
+    return client.dealChecklistItem.update({
       where: { id: itemId },
       data,
     });
@@ -121,10 +117,11 @@ export class DealRepository extends BaseRepository<
   async addDealDocument(
     dealId: string,
     uploadedBy: string,
-    data: { type: any; name: string; url: string; cloudinaryId?: string | null; visibility?: any },
+    data: { type: DealDocumentType; name: string; url: string; cloudinaryId?: string | null; visibility?: Visibility },
     tx?: PrismaTx
   ): Promise<DealDocument> {
-    return this.prisma.dealDocument.create({
+    const client = tx || this.prisma;
+    return client.dealDocument.create({
       data: {
         dealId,
         uploadedBy,

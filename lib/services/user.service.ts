@@ -2,7 +2,7 @@ import { User, Role } from "@prisma/client";
 import { userRepository, UserRepository } from "@/lib/repositories/user.repository";
 import { CreateUserDTO, UpdateUserDTO, CreateUserSchema, UpdateUserSchema } from "@/lib/dto/user.dto";
 import { ConflictError, NotFoundError, ValidationError } from "@/lib/errors/app-error";
-import { prisma, PrismaTx } from "@/lib/db/prisma";
+import { PrismaTx } from "@/lib/db/prisma";
 
 export class UserService {
   constructor(private readonly userRepo: UserRepository) {}

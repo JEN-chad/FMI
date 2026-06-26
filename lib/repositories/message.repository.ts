@@ -40,7 +40,7 @@ export class MessageRepository extends BaseRepository<
       },
     });
 
-    const result = formatCursorResult(items, limit);
+    const result = formatCursorResult<Message>(items, limit);
     
     // Reverse the returned page of data so they are in chronological order (oldest first)
     result.data = [...result.data].reverse();

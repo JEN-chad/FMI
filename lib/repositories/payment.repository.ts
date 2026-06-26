@@ -1,12 +1,12 @@
 import { Payment, PaymentStatus } from "@prisma/client";
 import { BaseRepository } from "./base/base.repository";
-import { CreatePaymentDTO, UpdatePaymentStatusDTO } from "@/lib/dto/payment.dto";
+import { CreatePaymentDTO } from "@/lib/dto/payment.dto";
 import { prisma, PrismaTx } from "@/lib/db/prisma";
 
 export class PaymentRepository extends BaseRepository<
   Payment,
-  CreatePaymentDTO & { userId: string },
-  UpdatePaymentStatusDTO & { providerPaymentId?: string | null; paidAt?: Date | null }
+  CreatePaymentDTO & { userId: string; provider?: string; providerOrderId?: string; status?: PaymentStatus },
+  Partial<Payment>
 > {
   constructor() {
     super(prisma, "payment");

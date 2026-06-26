@@ -1,12 +1,12 @@
 import { Offer, OfferStatus } from "@prisma/client";
 import { BaseRepository } from "./base/base.repository";
-import { CreateOfferDTO, UpdateOfferStatusDTO } from "@/lib/dto/offer.dto";
+import { CreateOfferDTO } from "@/lib/dto/offer.dto";
 import { prisma, PrismaTx } from "@/lib/db/prisma";
 
 export class OfferRepository extends BaseRepository<
   Offer,
-  Omit<CreateOfferDTO, "listingId"> & { listingId: string; buyerId: string; sellerId: string },
-  UpdateOfferStatusDTO & { counterAmount?: number | null; counterMessage?: string | null }
+  Omit<CreateOfferDTO, "listingId"> & { listingId: string; buyerId: string; sellerId: string; status?: OfferStatus },
+  Partial<Offer>
 > {
   constructor() {
     super(prisma, "offer");

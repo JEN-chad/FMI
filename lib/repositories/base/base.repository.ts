@@ -1,6 +1,40 @@
 import { PrismaClient } from "@prisma/client";
 import { PrismaTx } from "@/lib/db/prisma";
 
+export interface PrismaModelDelegate<T> {
+  findUnique(args: {
+    where: Record<string, unknown>;
+    select?: Record<string, unknown>;
+    include?: Record<string, unknown>;
+  }): Promise<T | null>;
+  findFirst(args: {
+    where: Record<string, unknown>;
+    orderBy?: unknown;
+    select?: Record<string, unknown>;
+    include?: Record<string, unknown>;
+  }): Promise<T | null>;
+  findMany(args: {
+    where?: Record<string, unknown>;
+    orderBy?: unknown;
+    take?: number;
+    skip?: number;
+    select?: Record<string, unknown>;
+    include?: Record<string, unknown>;
+  }): Promise<T[]>;
+  create(args: { data: unknown }): Promise<T>;
+  update(args: { where: { id: string }; data: unknown }): Promise<T>;
+  delete(args: { where: { id: string } }): Promise<T>;
+  count(args: { where?: Record<string, unknown> }): Promise<number>;
+  updateMany(args: {
+    where?: Record<string, unknown>;
+    data: Record<string, unknown>;
+  }): Promise<{ count: number }>;
+  aggregate(args: {
+    where?: Record<string, unknown>;
+    _avg?: Record<string, unknown>;
+  }): Promise<{ _avg: Record<string, number | null> }>;
+}
+
 export abstract class BaseRepository<T, CreateDTO, UpdateDTO> {
   constructor(
     protected readonly prisma: PrismaClient,
@@ -10,9 +44,9 @@ export abstract class BaseRepository<T, CreateDTO, UpdateDTO> {
   /**
    * Returns the model client, using the transaction client if active
    */
-  protected getModel(tx?: PrismaTx) {
+  protected getModel(tx?: PrismaTx): PrismaModelDelegate<T> {
     const client = tx || this.prisma;
-    return (client as any)[this.modelName];
+    return (client as unknown as Record<string, PrismaModelDelegate<T>>)[this.modelName];
   }
 
   /**
@@ -27,7 +61,7 @@ export abstract class BaseRepository<T, CreateDTO, UpdateDTO> {
   /**
    * Retrieves the first record matching the filter, ensuring it is not soft-deleted
    */
-  async findFirst(where: any, tx?: PrismaTx): Promise<T | null> {
+  async findFirst(where: Record<string, unknown>, tx?: PrismaTx): Promise<T | null> {
     return this.getModel(tx).findFirst({
       where: { ...where, deletedAt: null },
     });
@@ -38,12 +72,12 @@ export abstract class BaseRepository<T, CreateDTO, UpdateDTO> {
    */
   async findMany(
     params: {
-      where?: any;
-      orderBy?: any;
+      where?: Record<string, unknown>;
+      orderBy?: unknown;
       take?: number;
       skip?: number;
-      include?: any;
-      select?: any;
+      include?: Record<string, unknown>;
+      select?: Record<string, unknown>;
     } = {},
     tx?: PrismaTx
   ): Promise<T[]> {
@@ -95,7 +129,7 @@ export abstract class BaseRepository<T, CreateDTO, UpdateDTO> {
   /**
    * Counts the number of active records matching the filter
    */
-  async count(where: any = {}, tx?: PrismaTx): Promise<number> {
+  async count(where: Record<string, unknown> = {}, tx?: PrismaTx): Promise<number> {
     const finalWhere = { ...where, deletedAt: null };
     return this.getModel(tx).count({
       where: finalWhere,

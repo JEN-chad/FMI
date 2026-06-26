@@ -1,6 +1,6 @@
-import { Listing, ListingStatus, Prisma } from "@prisma/client";
+import { Listing, ListingStatus, Prisma, ListingDocument, KycStatus } from "@prisma/client";
 import { BaseRepository } from "./base/base.repository";
-import { CreateListingDTO, UpdateListingDTO, ListingQueryDTO } from "@/lib/dto/listing.dto";
+import { CreateListingDTO, ListingQueryDTO } from "@/lib/dto/listing.dto";
 import { prisma, PrismaTx } from "@/lib/db/prisma";
 import {
   getOffsetParams,
@@ -10,10 +10,20 @@ import {
   PaginatedResult,
 } from "@/lib/utils/pagination";
 
+export type ListingWithDetails = Listing & {
+  seller: {
+    id: string;
+    name: string;
+    avatarUrl: string | null;
+    kycStatus: KycStatus;
+  };
+  documents: ListingDocument[];
+};
+
 export class ListingRepository extends BaseRepository<
   Listing,
-  CreateListingDTO & { sellerId: string; slug: string },
-  UpdateListingDTO
+  CreateListingDTO & { sellerId: string; slug: string; status?: ListingStatus },
+  Partial<Listing>
 > {
   constructor() {
     super(prisma, "listing");
@@ -24,6 +34,23 @@ export class ListingRepository extends BaseRepository<
    */
   async findBySlug(slug: string, tx?: PrismaTx): Promise<Listing | null> {
     return this.findFirst({ slug }, tx);
+  }
+
+  /**
+   * Finds a listing by its ID, eager loading its seller and active documents
+   */
+  async findWithDetails(id: string, tx?: PrismaTx): Promise<ListingWithDetails | null> {
+    return this.getModel(tx).findFirst({
+      where: { id, deletedAt: null },
+      include: {
+        seller: {
+          select: { id: true, name: true, avatarUrl: true, kycStatus: true },
+        },
+        documents: {
+          where: { deletedAt: null },
+        },
+      },
+    }) as unknown as Promise<ListingWithDetails | null>;
   }
 
   /**

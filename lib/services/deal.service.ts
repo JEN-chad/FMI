@@ -3,15 +3,12 @@ import { dealRepository, DealRepository } from "@/lib/repositories/deal.reposito
 import { listingRepository, ListingRepository } from "@/lib/repositories/listing.repository";
 import { userRepository, UserRepository } from "@/lib/repositories/user.repository";
 import {
-  CreateDealDTO,
   CreateDealDocumentDTO,
-  CreateChecklistItemDTO,
   UpdateChecklistItemDTO,
   CreateDealDocumentSchema,
-  CreateChecklistItemSchema,
   UpdateChecklistItemSchema,
 } from "@/lib/dto/deal.dto";
-import { NotFoundError, ValidationError, ForbiddenError } from "@/lib/errors/app-error";
+import { NotFoundError, ForbiddenError } from "@/lib/errors/app-error";
 import { prisma, PrismaTx } from "@/lib/db/prisma";
 
 export class DealService {
@@ -76,7 +73,7 @@ export class DealService {
       throw new ForbiddenError("Not authorized to update checklist");
     }
 
-    const updateData: any = { ...validated };
+    const updateData: Record<string, unknown> = { ...validated };
     if (validated.isCompleted !== undefined) {
       updateData.completedBy = validated.isCompleted ? userId : null;
       updateData.completedAt = validated.isCompleted ? new Date() : null;
@@ -126,7 +123,7 @@ export class DealService {
     const isBuyer = deal.buyerId === userId;
 
     return prisma.$transaction(async (tx) => {
-      const updatePayload: any = {};
+      const updatePayload: Record<string, unknown> = {};
       if (isBuyer) {
         updatePayload.buyerSigned = true;
       } else {
@@ -167,7 +164,7 @@ export class DealService {
     }
 
     return prisma.$transaction(async (tx) => {
-      const updatePayload: any = {
+      const updatePayload: Record<string, unknown> = {
         escrowStatus: status,
         escrowReference: reference || null,
       };

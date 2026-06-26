@@ -11,7 +11,7 @@ import {
   CreateListingDocumentSchema,
   ListingQuerySchema,
 } from "@/lib/dto/listing.dto";
-import { NotFoundError, ValidationError, ForbiddenError, ConflictError } from "@/lib/errors/app-error";
+import { NotFoundError, ValidationError, ForbiddenError } from "@/lib/errors/app-error";
 import { prisma, PrismaTx } from "@/lib/db/prisma";
 import { PaginatedResult } from "@/lib/utils/pagination";
 
@@ -88,12 +88,12 @@ export class ListingService {
       throw new ForbiddenError("You do not have permission to modify this listing");
     }
 
-    // Generate new slug if title changes and listing is still in DRAFT
+    const updatePayload: Partial<Listing> = { ...validated };
     if (validated.title && validated.title !== listing.title && listing.status === ListingStatus.DRAFT) {
-      (validated as any).slug = this.generateSlug(validated.title);
+      updatePayload.slug = this.generateSlug(validated.title);
     }
 
-    return this.listingRepo.update(listingId, validated, tx);
+    return this.listingRepo.update(listingId, updatePayload, tx);
   }
 
   /**
@@ -170,25 +170,15 @@ export class ListingService {
   /**
    * Retrieves listing details, scrubbing private fields if NDA gating is active and not signed
    */
-  async getListingDetails(listingId: string, viewerId?: string, tx?: PrismaTx): Promise<any> {
-    const listing = await this.listingRepo.getModel(tx).findFirst({
-      where: { id: listingId, deletedAt: null },
-      include: {
-        seller: {
-          select: { id: true, name: true, avatarUrl: true, kycStatus: true },
-        },
-        documents: {
-          where: { deletedAt: null },
-        },
-      },
-    });
+  async getListingDetails(listingId: string, viewerId?: string, tx?: PrismaTx): Promise<unknown> {
+    const listing = await this.listingRepo.findWithDetails(listingId, tx);
 
     if (!listing) {
       throw new NotFoundError("Listing not found");
     }
 
     // Increment view count asynchronously
-    this.listingRepo.incrementViewCount(listingId, tx).catch((err) => {
+    this.listingRepo.incrementViewCount(listingId, tx).catch(() => {
       // Log error silently, do not fail the request
     });
 

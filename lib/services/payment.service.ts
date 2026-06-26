@@ -1,6 +1,6 @@
 import { Payment, PaymentStatus, PaymentPurpose, EscrowStatus } from "@prisma/client";
 import { paymentRepository, PaymentRepository } from "@/lib/repositories/payment.repository";
-import { listingService, ListingService } from "@/lib/services/listing.service";
+import { listingService } from "@/lib/services/listing.service";
 import { userRepository, UserRepository } from "@/lib/repositories/user.repository";
 import { CreatePaymentDTO, VerifyPaymentDTO, CreatePaymentSchema, VerifyPaymentSchema } from "@/lib/dto/payment.dto";
 import { NotFoundError, ValidationError, ForbiddenError } from "@/lib/errors/app-error";

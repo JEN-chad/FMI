@@ -5,7 +5,7 @@ export const CreateNotificationSchema = z.object({
   type: z.string().min(1, "Notification type is required"),
   title: z.string().min(1, "Notification title is required"),
   body: z.string().optional().nullable(),
-  data: z.record(z.any()).optional().nullable(),
+  data: z.any().optional().nullable(),
 });
 
 export type CreateNotificationDTO = z.infer<typeof CreateNotificationSchema>;

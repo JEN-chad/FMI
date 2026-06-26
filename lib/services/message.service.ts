@@ -4,7 +4,7 @@ import { dealRepository, DealRepository } from "@/lib/repositories/deal.reposito
 import { userRepository, UserRepository } from "@/lib/repositories/user.repository";
 import { CreateMessageDTO, CreateMessageSchema } from "@/lib/dto/message.dto";
 import { NotFoundError, ForbiddenError } from "@/lib/errors/app-error";
-import { prisma, PrismaTx } from "@/lib/db/prisma";
+import { PrismaTx } from "@/lib/db/prisma";
 import { PaginatedResult } from "@/lib/utils/pagination";
 
 export class MessageService {

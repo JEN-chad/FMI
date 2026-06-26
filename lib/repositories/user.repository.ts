@@ -1,4 +1,4 @@
-import { User, KycStatus, Role } from "@prisma/client";
+import { User, KycStatus } from "@prisma/client";
 import { BaseRepository } from "./base/base.repository";
 import { CreateUserDTO, UpdateUserDTO } from "@/lib/dto/user.dto";
 import { prisma, PrismaTx } from "@/lib/db/prisma";

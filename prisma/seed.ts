@@ -1,6 +1,6 @@
-import { PrismaClient, Role, KycStatus, KycType, AssetType, PricingModel, ListingStatus, DocumentType, NdaStatus, OfferStatus, DealStage, EscrowStatus, DealDocumentType, Visibility, ChecklistItemAssignee, MessageType, PaymentPurpose, PaymentStatus, ReviewRole, InvestorType, ExperienceLevel } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import "dotenv/config";
+import { Role, KycStatus, KycType, AssetType, PricingModel, ListingStatus, DocumentType, NdaStatus, OfferStatus, DealStage, EscrowStatus, ChecklistItemAssignee, PaymentPurpose, PaymentStatus, ReviewRole, InvestorType, ExperienceLevel } from "@prisma/client";
+import { prisma } from "../lib/db/prisma";
 
 async function main() {
   console.log("Cleaning database...");
@@ -66,7 +66,7 @@ async function main() {
   });
 
   // 4. Create Unverified User
-  const unverified = await prisma.user.create({
+  await prisma.user.create({
     data: {
       name: "Rohit Patel",
       email: "rohit@unverified.in",
@@ -170,7 +170,7 @@ async function main() {
   });
 
   // 2. Live eCommerce Listing
-  const ecomListing = await prisma.listing.create({
+  await prisma.listing.create({
     data: {
       sellerId: seller.id,
       slug: "khadi-organic-cosmetics",

@@ -1,12 +1,12 @@
 import { KycProfile, KycStatus } from "@prisma/client";
 import { BaseRepository } from "./base/base.repository";
-import { SubmitKycDTO, ReviewKycDTO } from "@/lib/dto/kyc.dto";
+import { SubmitKycDTO } from "@/lib/dto/kyc.dto";
 import { prisma, PrismaTx } from "@/lib/db/prisma";
 
 export class KycProfileRepository extends BaseRepository<
   KycProfile,
-  SubmitKycDTO & { userId: string },
-  ReviewKycDTO & { reviewedBy?: string; reviewedAt?: Date }
+  SubmitKycDTO & { userId: string; status?: KycStatus },
+  Partial<KycProfile>
 > {
   constructor() {
     super(prisma, "kycProfile");

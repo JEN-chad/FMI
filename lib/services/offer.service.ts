@@ -1,10 +1,10 @@
-import { Offer, OfferStatus, Deal, DealStage, ListingStatus, KycStatus, NdaStatus, ChecklistItemAssignee } from "@prisma/client";
+import { Offer, OfferStatus, Deal, ListingStatus, KycStatus, NdaStatus, ChecklistItemAssignee, Prisma } from "@prisma/client";
 import { offerRepository, OfferRepository } from "@/lib/repositories/offer.repository";
 import { listingRepository, ListingRepository } from "@/lib/repositories/listing.repository";
 import { userRepository, UserRepository } from "@/lib/repositories/user.repository";
 import { dealRepository, DealRepository } from "@/lib/repositories/deal.repository";
 import { CreateOfferDTO, CounterOfferDTO, CreateOfferSchema, CounterOfferSchema } from "@/lib/dto/offer.dto";
-import { NotFoundError, ValidationError, ForbiddenError, ConflictError } from "@/lib/errors/app-error";
+import { NotFoundError, ValidationError, ForbiddenError } from "@/lib/errors/app-error";
 import { prisma, PrismaTx } from "@/lib/db/prisma";
 
 export class OfferService {
@@ -91,13 +91,12 @@ export class OfferService {
       throw new ForbiddenError("You are not a party to this offer");
     }
 
-    // Update status to countered and save counter amount
     return this.offerRepo.update(offerId, {
       status: OfferStatus.COUNTERED,
-      counterAmount: validated.amount,
+      counterAmount: new Prisma.Decimal(validated.amount),
       counterMessage: validated.message,
       expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // Refresh expiry
-    } as any);
+    });
   }
 
   /**
@@ -123,7 +122,7 @@ export class OfferService {
       throw new ForbiddenError("You are not authorized to accept this offer or it is not your turn to act");
     }
 
-    const finalDealValue = offer.status === OfferStatus.COUNTERED ? offer.counterAmount! : offer.amount;
+    const finalDealValue = Number(offer.status === OfferStatus.COUNTERED ? offer.counterAmount! : offer.amount);
 
     // Run transaction
     return prisma.$transaction(async (tx) => {
@@ -153,7 +152,6 @@ export class OfferService {
           buyerId: offer.buyerId,
           sellerId: offer.sellerId,
           dealValue: finalDealValue,
-          stage: DealStage.DUE_DILIGENCE,
         },
         tx
       );

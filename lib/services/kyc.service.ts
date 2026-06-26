@@ -51,7 +51,7 @@ export class KycService {
             rejectionReason: null,
             reviewedBy: null,
             reviewedAt: null,
-          } as any,
+          },
           tx
         );
       } else {

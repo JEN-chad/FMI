@@ -33,7 +33,7 @@ export function decodeCursor<T = Record<string, unknown>>(cursor: string): T {
   try {
     const decoded = Buffer.from(cursor, "base64").toString("utf-8");
     return JSON.parse(decoded) as T;
-  } catch (error) {
+  } catch {
     throw new Error("Invalid pagination cursor");
   }
 }
@@ -83,7 +83,7 @@ export function getCursorParams(
   sortOrder: "asc" | "desc" = "desc"
 ) {
   const take = Math.max(1, limit) + 1; // Fetch one extra item to check hasNextPage
-  let whereClause: any = undefined;
+  let whereClause: Record<string, unknown> | undefined = undefined;
 
   if (cursorStr) {
     const cursor = decodeCursor<CursorPayload>(cursorStr);
