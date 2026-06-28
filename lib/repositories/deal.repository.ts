@@ -67,10 +67,10 @@ export class DealRepository extends BaseRepository<
         listing: true,
         offer: true,
         buyer: {
-          select: { id: true, name: true, email: true, phone: true, kycStatus: true },
+          select: { id: true, name: true, email: true, phoneNumber: true, kycStatus: true },
         },
         seller: {
-          select: { id: true, name: true, email: true, phone: true, kycStatus: true },
+          select: { id: true, name: true, email: true, phoneNumber: true, kycStatus: true },
         },
         documents: {
           where: { deletedAt: null },

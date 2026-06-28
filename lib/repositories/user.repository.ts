@@ -18,8 +18,8 @@ export class UserRepository extends BaseRepository<User, CreateUserDTO, UpdateUs
   /**
    * Finds a user by their phone number
    */
-  async findByPhone(phone: string, tx?: PrismaTx): Promise<User | null> {
-    return this.findFirst({ phone }, tx);
+  async findByPhoneNumber(phoneNumber: string, tx?: PrismaTx): Promise<User | null> {
+    return this.findFirst({ phoneNumber }, tx);
   }
 
   /**

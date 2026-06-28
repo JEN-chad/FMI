@@ -21,8 +21,8 @@ export class UserService {
     }
 
     // Check for duplicate phone
-    if (validated.phone) {
-      const existingPhone = await this.userRepo.findByPhone(validated.phone, tx);
+    if (validated.phoneNumber) {
+      const existingPhone = await this.userRepo.findByPhoneNumber(validated.phoneNumber, tx);
       if (existingPhone) {
         throw new ConflictError("A user with this phone number already exists");
       }
@@ -44,8 +44,8 @@ export class UserService {
     }
 
     // If email is changing (though usually read-only, check if provided)
-    if (validated.phone && validated.phone !== user.phone) {
-      const existingPhone = await this.userRepo.findByPhone(validated.phone, tx);
+    if (validated.phoneNumber && validated.phoneNumber !== user.phoneNumber) {
+      const existingPhone = await this.userRepo.findByPhoneNumber(validated.phoneNumber, tx);
       if (existingPhone && existingPhone.id !== userId) {
         throw new ConflictError("Phone number is already taken by another account");
       }

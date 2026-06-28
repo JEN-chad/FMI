@@ -22,7 +22,13 @@ export class DealService {
    * Retrieves full details of a deal, checking user permissions
    */
   async getDealDetails(userId: string, dealId: string, tx?: PrismaTx) {
-    const deal = await this.dealRepo.findWithDetails(dealId, tx);
+    const deal = await this.dealRepo.findWithDetails(dealId, tx) as (Deal & {
+      documents: DealDocument[];
+      checklistItems: DealChecklistItem[];
+      listing: any;
+      buyer: any;
+      seller: any;
+    }) | null;
     if (!deal) {
       throw new NotFoundError("Deal not found");
     }

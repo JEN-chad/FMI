@@ -1,0 +1,1 @@
+export default function VerifyPage() { return <main className="flex min-h-screen items-center justify-center px-6"><div className="max-w-md text-center"><h1 className="text-2xl font-semibold">Verification</h1><p className="mt-3 text-muted-foreground">Check your email or phone for your verification code, then continue from the sign-in flow.</p></div></main>; }

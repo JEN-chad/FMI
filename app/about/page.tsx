@@ -1,0 +1,1 @@
+export default function AboutPage() { return <main className="mx-auto max-w-3xl px-6 py-16"><h1 className="text-3xl font-semibold">About FMI</h1><p className="mt-4 text-muted-foreground">FMI helps verified buyers and sellers transact digital businesses with role-based workflows, due diligence, and secure deal rooms.</p></main>; }

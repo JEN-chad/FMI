@@ -155,8 +155,8 @@ model User {
   id            String    @id @default(uuid()) @db.Uuid
   email         String    @unique
   emailVerified Boolean   @default(false) @map("email_verified")
-  phone         String?   @unique
-  phoneVerified Boolean   @default(false) @map("phone_verified")
+  phoneNumber         String?   @unique @map("phone_number")
+  phoneNumberVerified Boolean   @default(false) @map("phone_number_verified")
   name          String
   avatarUrl     String?   @map("avatar_url")
   role          Role      @default(BUYER)
@@ -215,7 +215,7 @@ model Account {
   accessToken           String?   @map("access_token")
   refreshToken          String?   @map("refresh_token")
   idToken               String?   @map("id_token")
-  accessTokenExpiresAt  DateTime? @map("access_token_expires_at")
+  expiresAt             DateTime? @map("expires_at")
   refreshTokenExpiresAt DateTime? @map("refresh_token_expires_at")
   scope                 String?
   password              String?

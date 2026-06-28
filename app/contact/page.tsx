@@ -1,0 +1,1 @@
+export default function ContactPage() { return <main className="mx-auto max-w-3xl px-6 py-16"><h1 className="text-3xl font-semibold">Contact</h1><p className="mt-4 text-muted-foreground">For support, reach the FMI operations team through your dashboard notifications or verified account email.</p></main>; }

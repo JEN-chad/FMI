@@ -73,6 +73,49 @@ export class KycService {
   }
 
   /**
+   * Saves a draft of the KYC profile (partial details)
+   */
+  async saveKycDraft(
+    userId: string,
+    kycType: KycType | null,
+    dto: Partial<Record<keyof SubmitKycDTO, string | null>>
+  ): Promise<KycProfile> {
+    return prisma.$transaction(async (tx) => {
+      const existingProfile = await this.kycRepo.findByUserId(userId, tx);
+
+      const user = await this.userRepo.findById(userId, tx);
+      if (!user) {
+        throw new NotFoundError("User not found");
+      }
+
+      let profile: KycProfile;
+      if (existingProfile) {
+        profile = await this.kycRepo.update(
+          existingProfile.id,
+          dto,
+          tx
+        );
+      } else {
+        profile = await this.kycRepo.create(
+          {
+            ...dto,
+            userId,
+            status: KycStatus.NOT_STARTED,
+          } as unknown as Parameters<typeof this.kycRepo.create>[0],
+          tx
+        );
+      }
+
+      // Update user kycType if provided
+      if (kycType) {
+        await this.userRepo.update(userId, { kycType }, tx);
+      }
+
+      return profile;
+    });
+  }
+
+  /**
    * Admin: Approves or rejects a user's KYC profile
    */
   async reviewKyc(
